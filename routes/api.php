@@ -23,6 +23,8 @@ Route::namespace('Api')->group(function () {
     Route::post('/students/ages', 'StudentController@getAge');
 
     Route::post('/students/ages/{age}', 'StudentController@getForAge');
+    Route::post('/students/gender/{gender}', 'StudentController@getForGender');
+    Route::post('/students/name/{name}', 'StudentController@getForName');
     
     Route::post('/students/filter', 'StudentController@filter');
 });

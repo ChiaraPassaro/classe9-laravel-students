@@ -75,7 +75,8 @@ class StudentController extends Controller
             $studentsAge[$thisName] = $student['age'];
         }
 
-        return response()->json($studentsAge);
+        // restituisco
+        return response()->json($studentsFiltered);
 
     }
 
@@ -90,12 +91,86 @@ class StudentController extends Controller
                 $studentsFiltered[] = $student;
             }
         }
-        
+
+        // restituisco
+        return response()->json($studentsFiltered);
+
+    }
+
+    public function getForName($name)
+    {
+        $students = $this->students;
+
+        $studentsFiltered = [];
+
+        foreach ($students as $student) {
+            if($student['name'] == $name) {
+                $studentsFiltered[] = $student;
+            }
+        }
+
+        // restituisco
+        return response()->json($studentsFiltered);
+
+    }
+
+    public function getForGender($gender)
+    {
+        $students = $this->students;
+
+        $studentsFiltered = [];
+
+        foreach ($students as $student) {
+            if($student['gender'] == $gender) {
+                $studentsFiltered[] = $student;
+            }
+        }
+
+        // restituisco
         return response()->json($studentsFiltered);
 
     }
 
     public function filter(Request $request)
+    {
+        // $students = config('students.students');
+        $students = $this->students;
+        
+        //tipi ammessi
+        $tyeRequest = [
+            'name',
+            'age',
+            'gender'
+        ];
+
+        //prendo tutti i request
+        $data = $request->all();
+        
+        //elimino quelli non desiderati confrontandoli con i tipi ammessi
+        foreach (array_keys($data) as $value) {
+            if(!in_array($value, $tyeRequest)) {
+                unset($data[$value]);
+            }
+        }
+
+        //per ogni data chiamo funzione che filtra
+        foreach ($data as $key => $value) {
+            //se siamo al primo giro
+            if($key == array_key_first($data)) {
+                //filtro studenti
+                $studentsFiltered = $this->getFor($key, $value, $students);;
+            } else {
+                //se sono ai successivi filtro con $filteredStudents
+                $studentsFiltered = $this->getFor($key, $value, $studentsFiltered);
+            }
+        }
+
+        // restituisco
+        return response()->json($studentsFiltered);
+
+    }
+
+    /*public function filter(Request $request)
     {
         // $students = config('students.students');
         $students = $this->students;
@@ -144,6 +219,21 @@ class StudentController extends Controller
         
         return response()->json($studentsFiltered);
 
+    }*/
+
+    //questa funzione possiamo usarla solo nella classe perché è privata
+    private function getFor($type, $value, $array)
+    {
+    
+        $arrayFiltered = [];
+
+        foreach ($array as $element) {
+            if ($element[$type] == $value) {
+                $arrayFiltered[] = $element;
+            }
+        }
+
+        return $arrayFiltered;
     }
 
 
