@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Student;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -10,7 +10,7 @@ class StudentController extends Controller
 
     public function __construct()
     {
-       $this->students = [
+        /*    $this->students = [
             [
                 'img' => 'https://www.topolino.it/wp-content/uploads/2019/12/pippointera.png',
                 'name' => 'Pippo',
@@ -41,7 +41,10 @@ class StudentController extends Controller
                 'gender' => 'f',
                 'slug' => 'minnie'
             ]
-        ];
+        ];*/
+        //select * from students
+        $this->students = Student::all();
+        dd($this->students);
     }
 
     public function index() 

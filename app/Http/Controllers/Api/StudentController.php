@@ -76,7 +76,7 @@ class StudentController extends Controller
         }
 
         // restituisco
-        return response()->json($studentsFiltered);
+        return response()->json($studentsAge);
 
     }
 
@@ -89,79 +89,6 @@ class StudentController extends Controller
         foreach ($students as $student) {
             if($student['age'] == $age) {
                 $studentsFiltered[] = $student;
-            }
-        }
-
-        // restituisco
-        return response()->json($studentsFiltered);
-
-    }
-
-    public function getForName($name)
-    {
-        $students = $this->students;
-
-        $studentsFiltered = [];
-
-        foreach ($students as $student) {
-            if($student['name'] == $name) {
-                $studentsFiltered[] = $student;
-            }
-        }
-
-        // restituisco
-        return response()->json($studentsFiltered);
-
-    }
-
-    public function getForGender($gender)
-    {
-        $students = $this->students;
-
-        $studentsFiltered = [];
-
-        foreach ($students as $student) {
-            if($student['gender'] == $gender) {
-                $studentsFiltered[] = $student;
-            }
-        }
-
-        // restituisco
-        return response()->json($studentsFiltered);
-
-    }
-
-    public function filter(Request $request)
-    {
-        // $students = config('students.students');
-        $students = $this->students;
-        
-        //tipi ammessi
-        $tyeRequest = [
-            'name',
-            'age',
-            'gender'
-        ];
-
-        //prendo tutti i request
-        $data = $request->all();
-        
-        //elimino quelli non desiderati confrontandoli con i tipi ammessi
-        foreach (array_keys($data) as $value) {
-            if(!in_array($value, $tyeRequest)) {
-                unset($data[$value]);
-            }
-        }
-
-        //per ogni data chiamo funzione che filtra
-        foreach ($data as $key => $value) {
-            //se siamo al primo giro
-            if($key == array_key_first($data)) {
-                //filtro studenti
-                $studentsFiltered = $this->getFor($key, $value, $students);;
-            } else {
-                //se sono ai successivi filtro con $filteredStudents
-                $studentsFiltered = $this->getFor($key, $value, $studentsFiltered);
             }
         }
 
@@ -220,21 +147,51 @@ class StudentController extends Controller
         return response()->json($studentsFiltered);
 
     }*/
-
-    //questa funzione possiamo usarla solo nella classe perché è privata
-    private function getFor($type, $value, $array)
-    {
     
-        $arrayFiltered = [];
+    public function filter(Request $request) {
+        $students = $this->students;
 
-        foreach ($array as $element) {
-            if ($element[$type] == $value) {
-                $arrayFiltered[] = $element;
+        // data ammnessi per filtare
+        $typeRequest = [
+            'age',
+            'name',
+            'gender'
+        ];
+        $data = $request->all();
+
+        foreach ($data as $key => $value) {
+            if(!in_array($key, $typeRequest)) {
+                unset($data[$key]);
             }
         }
 
-        return $arrayFiltered;
+        //i data sono filtrati e quindi sono data ammessi
+
+        foreach ($data as $key => $value) {
+            //se siamo al primo giro uso students
+            if(array_key_first($data) == $key) {
+                $studentsFiltered = $this->filterFor($key, $value, $students);
+            } 
+            //in tutti gli altri casi uso studentsFiltered
+            else {
+                $studentsFiltered = $this->filterFor($key, $value, $studentsFiltered);
+            }
+        }
+
+
+        return response()->json($studentsFiltered);
     }
 
+    private function filterFor($type, $value, $array)
+    {
+        
+        $filtered = [];
+        foreach ($array as $element) {
+            if ($element[$type] == $value) {
+                $filtered[] = $element;
+            }
+        }
+        return $filtered;
+    }
 
 }
